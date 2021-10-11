@@ -1,8 +1,9 @@
 package com.herocuapp.theinternet.loginpagetests;
 
 import com.herokuapp.theinternet.base.TestUtilities;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import com.herokuapp.theinternet.pages.LoginPage;
+import com.herokuapp.theinternet.pages.SecureAreaPage;
+import com.herokuapp.theinternet.pages.WelcomePageObject;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
@@ -14,24 +15,19 @@ public class NegativeLoginTests extends TestUtilities {
 
         log.info("Starting negativeLoginTest with " + username + " and " + password);
 
-        String url = "http://the-internet.herokuapp.com/login";
-        driver.get(url);
-        log.info("Page is opened");
+// open test page
+        WelcomePageObject welcomePageObject = new WelcomePageObject(driver, log);
+        welcomePageObject.openPage();
 
-        WebElement usernameElement = driver.findElement(By.id("username"));
-        usernameElement.sendKeys(username);
+// click on form authentication link
+        LoginPage loginPage = welcomePageObject.clickFormAuthenticationLink();
 
-        WebElement passwordElement = driver.findElement(By.name("password"));
-        passwordElement.sendKeys(password);
+// execute login
+        loginPage.negativeLogin(username, password);
+        loginPage.waitForErrorMessage();
 
-        WebElement loginButton = driver.findElement(By.xpath("//button[contains(@type, 'submit')]"));
-        loginButton.click();
-
-        //verification
-
-        WebElement notSuccessMessage = driver.findElement(By.cssSelector("#flash"));
-        String actualMessage = notSuccessMessage.getText();
-
+//verification
+        String actualMessage = loginPage.getErrorMessage();
         Assert.assertTrue(actualMessage.contains(expectedMessage), "Actual message is not the same as expected");
 
     }
